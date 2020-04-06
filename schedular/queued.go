@@ -28,7 +28,7 @@ func (s *QueuedScheduler) Run() {
 	go func() {
 		var requestQ []engine.Request
 		var workerQ []chan engine.Request
-
+		
 		for {
 			var activeReq engine.Request
 			var activeWorker chan engine.Request

@@ -16,7 +16,7 @@ func ItemSaver(index string) (chan model.HouseDetail, error) {
 	out := make(chan model.HouseDetail)
 
 	go func() {
-		itemCount := 0
+		itemCount := 1
 		for {
 			item := <-out
 			log.Printf("got item"+"#%d: %v", itemCount, item)
