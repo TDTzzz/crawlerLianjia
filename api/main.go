@@ -2,19 +2,17 @@ package main
 
 import (
 	"github.com/TDTzzz/crawlerLianjia/api/control"
-	"log"
+	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func main() {
-	//router := gin.Default()
-	//router.GET("/gua", func(c *gin.Context) {
-	//	c.JSON(200, gin.H{
-	//		"msg": "aa",
-	//	})
-	//})
-	//router.Run()
-
-	searchClient := control.CreateSearchResHandler()
-	res, _ := searchClient.GetSearchRes()
-	log.Print(res)
+	router := gin.Default()
+	router.GET("/avg_price/:region", func(c *gin.Context) {
+		region := c.Param("region")
+		searchClient := control.CreateSearchResHandler()
+		res := searchClient.AvgPriceSearch(region, "2020-04-07", "2020-04-08")
+		c.JSON(http.StatusOK, res)
+	})
+	router.Run()
 }
