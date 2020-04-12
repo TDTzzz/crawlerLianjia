@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	res := control.CreateSearchResHandler().SubRegion("武昌")
+	res := control.CreateSearchResHandler().AvgPriceSearchV2("Region.keyword", "武昌", "2020-04-05", "2020-04-10")
 	log.Println(res)
 }

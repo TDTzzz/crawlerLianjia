@@ -86,6 +86,54 @@ func parsePrice(raw map[string]interface{}) map[string]PriceResults {
 	return res
 }
 
+//用pipeline Aggregation算各区域的平均价格日期直方图
+func (h SearchResultHandler) AvgPriceSearchV2(name string, value string, st string, ed string) map[string]PriceResults {
+	boolQuery := commonBoolQuery(name, value, st, ed)
+
+	pipelineScript := elastic.NewScript("params.A/params.B*10000")
+	pipeAgg := elastic.NewBucketScriptAggregation().AddBucketsPath("A", "sumPrice").
+		AddBucketsPath("B", "sumArea").Script(pipelineScript)
+
+	termsAgg := elastic.NewTermsAggregation().Field("SubRegion.keyword").
+		SubAggregation("sumPrice", elastic.NewSumAggregation().Field("TotalPrice")).
+		SubAggregation("sumArea", elastic.NewSumAggregation().Field("Area")).
+		SubAggregation("avgPrice", pipeAgg)
+
+	dateAgg := elastic.NewDateHistogramAggregation().
+		Field("Date").CalendarInterval("day").Format("yyyy-MM-dd").
+		SubAggregation("regions", termsAgg).
+		SubAggregation("sumPrice", elastic.NewSumAggregation().Field("TotalPrice")).
+		SubAggregation("sumArea", elastic.NewSumAggregation().Field("Area")).
+		SubAggregation("avgPrice", pipeAgg)
+
+	data, _ := h.client.Search().Index(config.ElasticIndex).Query(boolQuery).Size(0).
+		Aggregation("per_day", dateAgg).Do(context.Background())
+	var dat map[string]interface{}
+	aa, _ := data.Aggregations["per_day"].MarshalJSON()
+	json.Unmarshal(aa, &dat)
+	return parsePriceV2(dat)
+}
+
+func parsePriceV2(raw map[string]interface{}) map[string]PriceResults {
+	var res = make(map[string]PriceResults)
+	data := raw["buckets"]
+	for _, v := range data.([]interface{}) {
+		tmp := v.(map[string]interface{})
+		date := tmp["key_as_string"].(string)
+		regions := tmp["regions"].(map[string]interface{})
+		for _, vv := range regions["buckets"].([]interface{}) {
+			tmp2 := vv.(map[string]interface{})
+			res[date] = append(res[date], PriceRes{
+				Date:     date,
+				Cnt:      int(tmp2["doc_count"].(float64)),
+				Key:      tmp2["key"].(string),
+				AvgPrice: tmp2["avgPrice"].(map[string]interface{})["value"].(float64),
+			})
+		}
+	}
+	return res
+}
+
 type PriceRes struct {
 	Date     string
 	Cnt      int

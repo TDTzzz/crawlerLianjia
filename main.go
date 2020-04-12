@@ -16,7 +16,7 @@ func main() {
 
 	e := engine.ConcurrentEngine{
 		Scheduler:   &schedular.QueuedScheduler{},
-		WorkerCount: 8,
+		WorkerCount: 10,
 		ItemChan:    itemChan,
 	}
 
