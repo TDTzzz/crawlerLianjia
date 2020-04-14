@@ -7,7 +7,6 @@ import (
 
 func InitRouter() *gin.Engine {
 	r := gin.New()
-
 	//测试路由组
 	v1 := r.Group("/v1")
 	{
@@ -22,6 +21,6 @@ func InitRouter() *gin.Engine {
 		price.GET("/community/:name", control.RegionPrice)
 	}
 
-	r.Run(":8080")
+	r.Run(":8081")
 	return r
 }

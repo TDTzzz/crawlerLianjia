@@ -16,7 +16,7 @@ func main() {
 
 	e := engine.ConcurrentEngine{
 		Scheduler:   &schedular.QueuedScheduler{},
-		WorkerCount: 10,
+		WorkerCount: 12,
 		ItemChan:    itemChan,
 	}
 
@@ -24,6 +24,7 @@ func main() {
 		Url:       "https://wh.lianjia.com/ershoufang/",
 		ParseFunc: parser.RegionList,
 	}
+
 	e.Run(req)
 	//engine.SimpleEngine{}.Run(req) //单机版爬虫
 }
