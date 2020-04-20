@@ -60,17 +60,11 @@ func (ConcurrentEngine) createWorker(in chan Request, out chan ParseResult, read
 			ready.WorkerReady(in)
 			req := <-in
 			res, err := Worker(req)
-
 			for err != nil {
 				log.Println(req.Url)
 				log.Println("creatWorker Err %v", err)
 				res, err = Worker(req)
 			}
-			//if err != nil {
-			//	log.Println(req.Url)
-			//	log.Println("creatWorker Err %v", err)
-			//	continue
-			//}
 			out <- res
 		}
 	}()

@@ -4,8 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/TDTzzz/crawlerLianjia/config"
+	"github.com/gin-gonic/gin"
 	"github.com/olivere/elastic/v7"
+	"net/http"
 )
+
+func RegionInfo(c *gin.Context) {
+	data := CreateSearchResHandler().Region()
+	c.JSON(http.StatusOK, data)
+}
 
 //获得区域信息
 func (h SearchResultHandler) Region() []string {
