@@ -15,26 +15,25 @@ func RegionInfo(c *gin.Context) {
 }
 
 //获得区域信息
-func (h SearchResultHandler) Region() []string {
+func (h SearchResultHandler) Region() map[string][]string {
 	termsAggs := elastic.NewTermsAggregation().Field("Region.keyword")
-	res, _ := h.client.Search().Index(config.ElasticIndex).Aggregation("regions", termsAggs).Do(context.Background())
-	data, _ := res.Aggregations["regions"].MarshalJSON()
+	esRes, _ := h.client.Search().Index(config.ElasticIndex).Aggregation("regions", termsAggs).Do(context.Background())
+	data, _ := esRes.Aggregations["regions"].MarshalJSON()
 	var dat map[string]interface{}
 	json.Unmarshal(data, &dat)
-	var regions []string
+	var res = make(map[string][]string)
 	for _, v := range dat["buckets"].([]interface{}) {
-		//log.Println(v)
 		tmp := v.(map[string]interface{})
-		regions = append(regions, tmp["key"].(string))
+		region := tmp["key"].(string)
+		res[region] = h.SubRegion(region)
 	}
-	return regions
+	return res
 }
 
 //获得区域下的subRegion信息
 func (h SearchResultHandler) SubRegion(region string) []string {
 	boolQuery := elastic.NewBoolQuery().Must(elastic.NewTermQuery("Region.keyword", region))
-
-	termsAggs := elastic.NewTermsAggregation().Field("SubRegion.keyword")
+	termsAggs := elastic.NewTermsAggregation().Field("SubRegion.keyword").Size(100)
 	res, _ := h.client.Search().Index(config.ElasticIndex).Query(boolQuery).
 		Aggregation("subRegions", termsAggs).Do(context.Background())
 	data, _ := res.Aggregations["subRegions"].MarshalJSON()

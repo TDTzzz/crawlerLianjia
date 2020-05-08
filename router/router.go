@@ -11,13 +11,6 @@ func InitRouter() *gin.Engine {
 
 	//中间件
 	r.Use(middleware.Options)
-
-	//测试路由组
-	v1 := r.Group("/v1")
-	{
-		v1.GET("/test", control.RegionPrice)
-	}
-
 	//房价
 	price := r.Group("/price")
 	{
