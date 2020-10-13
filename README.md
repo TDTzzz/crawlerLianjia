@@ -12,7 +12,7 @@
 
 存储：ElasticSearch 7.6.1
 
-可视化：Kibana+Vue(待实现)
+可视化：Kibana+Vue
 
 
 
@@ -23,16 +23,13 @@
 
 
 - [x] 用go协程实现并发爬取
-
 - [x] 用elastic储存数据
-
 - [x] 将es的数据用kibana可视化
-
-- [ ] 按照构想的数据维度，用gin将数据封装成api
-
-- [ ] 用vue搭建一个spa图看板页面
-
+- [x] 按照构想的数据维度，用gin将数据封装成api
+- [x] 用vue搭建一个spa图看板页面
 - [ ] 编写docker-compose，自动化部署
-
 - [ ] 结合docker搭建分布式并发架构
 
+
+
+> ps: 效果图见ex_imgs目录里
